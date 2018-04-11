@@ -1,0 +1,29 @@
+{
+  "name": "rhmap-aad-auth",
+  "version": "1.0.0",
+  "description": "An NPM module providing an express.js middleware function that can check Azure AD authentication.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TinyExplosions/rhmap-aad-auth.git"
+  },
+  "keywords": [
+    "express.js",
+    "node",
+    "azure ad",
+    "authentication"
+  ],
+  "author": "Al Graham",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/TinyExplosions/rhmap-aad-auth/issues"
+  },
+  "homepage": "https://github.com/TinyExplosions/rhmap-aad-auth#readme",
+  "dependencies": {
+    "fh-logger-helper": "^1.0.2",
+    "fh-mbaas-api": "^8.2.1"
+  }
+}
