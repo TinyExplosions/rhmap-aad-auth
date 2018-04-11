@@ -92,7 +92,7 @@ is in the following format.
 }
 ```
 
-###### req.User.id_token
+##### req.User.id_token
 
 ```js
 {
@@ -160,4 +160,4 @@ app.get('/bat', function (req, res, next) {
 
 ## License
 
-[MIT](LICENSE)
+[GPL-3.0](LICENSE)
