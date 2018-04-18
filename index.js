@@ -5,9 +5,12 @@ if (!process.env.SERVICE_ID) {
     Logger.error("process.env.SERVICE_ID not set");
 }
 
-exports = module.exports = function(groups, redirect) {
-    groups = groups || [];
-    groups = groups instanceof Array ? groups : [groups];
+exports = module.exports = function(opts) {
+    opts = opts || {};
+    var redirect = opts.redirect;
+    var roles = opts.roles || [];
+    roles = roles instanceof Array ? roles : [roles];
+    var scope = opts.scope
 
     return function protect(req, res, next) {
         if (!process.env.SERVICE_ID) {
@@ -37,7 +40,8 @@ exports = module.exports = function(groups, redirect) {
             "method": "POST",
             "params": {
                 sessionID: userID,
-                groups: groups
+                roles: roles,
+                scope: scope
             }
         }, function(err, body, service_res) {
             if (err) {

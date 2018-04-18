@@ -21,7 +21,7 @@ the Service ID of the RHMAP Azure AD Service.
 var validate = require('rhmap-aad-auth')
 ```
 
-### validate(groups, redirect)
+### validate(options)
 
 Create a validate middleware with the given options.
 
@@ -30,26 +30,35 @@ Create a validate middleware with the given options.
 
 `rhmap-aad-auth` accepts these properties in the options object.
 
-##### groups
+##### roles
 
-Specifies either a `string` or an `array` of AD Groups to check as part of the Authorisation step.
-
-```js
-var app = express()
-app.use(validate('app-superUser'))
-```
-
-Ensures that the request is from a user that is a member of the `app-superUser` group.
-
+Specifies either a `string` or an `array` of roles to check as part of the Authorisation step.
 
 ```js
 var app = express()
-app.use(validate(['app-read','app-write']))
+app.use(validate({roles: 'admin'}))
 ```
 
-Ensures that the request is from a user that is a member of either, or both the `app-superUser` group and
-the `app-write` group.
+Ensures that the request is from a user that is has an `admin` role set.
 
+
+```js
+var app = express()
+app.use(validate(['admin','user']))
+```
+
+Ensures that the request is from a user has either the `admin` or `user` roles (or both). This is case sensitive.
+
+##### scope
+
+Specifies a `string` with a scope to check as part of the Authorisation step.
+
+```js
+var app = express()
+app.use(validate({scope: 'RHMAP.Read'}))
+```
+
+Ensures that the request is from a user has `RHMAP.Read` scope as part of their account. This is case sensitive.
 
 ##### redirect
 
@@ -60,7 +69,7 @@ Specifies a `string` that will be used as a redirect url if authorisation fails 
 
 ```js
 var app = express()
-app.use(validate(null, '/login'))
+app.use(validate({redirect: '/login'}))
 ```
 
 This will redirect any failed authorisation attempts to the `/login` route of your app.
@@ -80,7 +89,7 @@ is in the following format.
 
 ##### req.User
 
-```js
+```json
 {
     "token_type": "Bearer",
     "expires_in": "3600",
@@ -94,7 +103,7 @@ is in the following format.
 
 ##### req.User.id_token
 
-```js
+```json
 {
   "aud": "a6c492a7-0011-1234-1a2b-f1a610c037bc",
   "iss": "https://sts.windows.net/ea93752e-a476-42d4-aaf4-7286352b0f7e/",
@@ -108,6 +117,10 @@ is in the following format.
   ],
   "family_name": "Bloggs",
   "given_name": "Joe",
+  "roles": [
+    "rhmap_user"
+  ],
+  "scp": "RHMAP.Read",
   "ipaddr": "218.101.10.34",
   "name": "Blogs, Joe (SOME COMPANY)",
   "nonce": "5a86a15d-41dd-49c0-86b1-904c2e731969",
@@ -122,6 +135,8 @@ is in the following format.
 }
 ```
 
+Note that the `roles` and `scp` attribute will only exist if the user has valid scope or roles entries.
+
 ## Example
 
 A simple example using `rhmap-aad-auth` to protect endpoints.
@@ -134,27 +149,27 @@ process.env.SERVICE_ID = "<serviceid>"
 var app = express()
 
 app.get('/login', function (req, res, next) {
-  res.send('you need to login to access the protected endpoints')
+    res.send('you need to login to access the protected endpoints')
 })
 
 app.get('/open', function (req, res, next) {
-  res.send('This page is availabe to the public')
+    res.send('This page is availabe to the public')
 })
 
-app.get('/foo', validate('admin'), function (req, res, next) {
-  res.send('You are in the admin group, and can view this page')
+app.get('/foo', validate({roles: "admin"}), function (req, res, next) {
+    res.send('You are in the admin group, and can view this page')
 })
 
 // If a user isn't authenticated, you will be redirected to the login page for any
-routes below here.
-app.use(validate('user', '/login'))
+// routes below here.
+app.use(validate({scope: 'user.read', redirect: '/login'}))
 
 app.get('/bar', function (req, res, next) {
-  res.send('You are in the user group, so can access this page')
+    res.send('You have user.read scope, so can access this page')
 })
 
-app.get('/bat', function (req, res, next) {
-  res.send('You are in the user group, so can access this page')
+app.get('/bat', validate({roles: 'editor', redirect: '/login'}), function (req, res, next) {
+    res.send('You have user.read scope, and are an editor, so can access this page')
 })
 ```
 
