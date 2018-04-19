@@ -56,6 +56,7 @@ exports = module.exports = function(opts) {
                 }
             } else {
                 if (service_res.statusCode == 200) {
+                    req.UserJWT = userID;
                     req.User = body;
                     return next();
                 } else {
