@@ -62,7 +62,7 @@ exports = module.exports = function(opts) {
                 } else {
                     Logger.error("not 200");
                     if (!redirect) {
-                        return response.status(service_res.statusCode).send(body);
+                        return res.status(service_res.statusCode).send(body);
                     } else {
                         res.AuthError = service_res.statusCode + " from the verify service";
                         return res.redirect(redirect);
