@@ -61,6 +61,9 @@ exports = module.exports = function(opts) {
                 if (service_res.statusCode == 200) {
                     req.UserJWT = userID;
                     req.User = body;
+                    if (callback) {
+                        return callback(null, userID);
+                    }
                     return next();
                 } else {
                     Logger.error("not 200");
