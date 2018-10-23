@@ -8,6 +8,7 @@ if (!process.env.SERVICE_ID) {
 exports = module.exports = function(opts) {
     opts = opts || {};
     var redirect = opts.redirect;
+    var callback = opts.callback;
     var roles = opts.roles || [];
     roles = roles instanceof Array ? roles : [roles];
     var scope = opts.scope
@@ -50,6 +51,8 @@ exports = module.exports = function(opts) {
                     // An error occurred
                     Logger.error('Service call failed: ', err, service_res);
                     return res.status(502).send("Server Error");
+                } else if (callback) {
+                    callback("Service call failed")
                 } else {
                     res.AuthError = "Service call failed";
                     return res.redirect(redirect);
@@ -63,6 +66,8 @@ exports = module.exports = function(opts) {
                     Logger.error("not 200");
                     if (!redirect) {
                         return res.status(service_res.statusCode).send(body);
+                    } else if (callback) {
+                        callback(service_res.statusCode + " from the verify service")
                     } else {
                         res.AuthError = service_res.statusCode + " from the verify service";
                         return res.redirect(redirect);
